@@ -1,0 +1,7 @@
+# Dependências do Node.js (ignora na raiz e em todos os serviços)
+node_modules/
+
+# Variáveis de ambiente locais (segredos)
+.env
+.env.*
+!.env.example
