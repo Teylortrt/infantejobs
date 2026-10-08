@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 const Vaga = require('../models/Vagas');
 // Cionexao com vagas
 
-//POST /vagas
-const criarVaga = async (req, res) => {
-    
-}
+
 
 // GET /vagas  (aceita filtros: ?status=ABERTA&modalidade=Remoto)
 const listarVagas = async (req, res) => {
@@ -50,6 +47,16 @@ const buscarVagaPorId = async (req, res) => {
     }
 }
 
+//PUT /vagas
+const criarVaga = async (req, res) => {
+    try {
+        const novaVaga = await Vaga.create(req.body);
+        return res.status(201).json(novaVaga);
+    } catch (erro){
+        //validadtion error = faltou campo obrigatorio, enum errado, etc
+        return res.status(400).jsno({erro: 'Dados invalidos', detalhes: erro.message});
+    }
+}
 
 
 
@@ -58,5 +65,6 @@ const buscarVagaPorId = async (req, res) => {
 module.exports = {
     listarVagas,
     buscarVagaPorId,
+    criarVaga,
 
 }
