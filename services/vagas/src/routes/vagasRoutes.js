@@ -6,6 +6,9 @@ const vagaController = require('../controllers/vagaController')
 router.get('/', vagaController.listarVagas);
 router.get('/:id', vagaController.buscarVagaPorId);
 router.post('/', vagaController.criarVaga);
+router.put('/:id', vagaController.atualizarVaga);
+router.patch('/:id/fechar', vagaController.fecharVaga);
+router.delete('/:id', vagaController.removerVaga);
 
 
 
