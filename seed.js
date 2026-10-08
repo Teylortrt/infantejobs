@@ -1,4 +1,75 @@
 // seed.js - Executa a criação das entidades, índices e dados iniciais no MongoDB
+
+/*
+ * ============================================================================
+ *  TUTORIAL: COMO POPULAR O BANCO DE DADOS
+ * ============================================================================
+ *
+ *  O QUE ESTE SCRIPT FAZ
+ *  ---------------------
+ *  Conecta nos 4 bancos lógicos do MongoDB (um por microsserviço), cria as
+ *  coleções e índices e insere um registro de exemplo em cada uma, já
+ *  vinculados entre si:
+ *
+ *    db_empresas     -> 1 empresa
+ *    db_candidatos   -> 1 candidato
+ *    db_vagas        -> 1 vaga        (empresaId   = ID da empresa criada)
+ *    db_candidaturas -> 1 candidatura (candidatoId + vagaId criados acima)
+ *
+ *  ⚠️  ATENÇÃO: o script APAGA todos os registros existentes dessas coleções
+ *      (deleteMany) antes de inserir os dados. Use só em ambiente local/teste.
+ *
+ *  PRÉ-REQUISITOS
+ *  --------------
+ *  1. Node.js instalado (v18 ou superior).
+ *  2. MongoDB rodando localmente na porta padrão 27017.
+ *     Para verificar:
+ *         mongosh --eval "db.runCommand({ ping: 1 })"
+ *     Se não estiver rodando (Linux com systemd):
+ *         sudo systemctl start mongod
+ *     Ou via Docker:
+ *         docker run -d --name mongo -p 27017:27017 mongo
+ *
+ *  PASSO A PASSO
+ *  -------------
+ *  1. Na RAIZ do repositório, instale o mongoose (só na primeira vez).
+ *     Se a raiz ainda não tiver package.json, crie antes com "npm init -y":
+ *         npm init -y
+ *         npm install mongoose
+ *
+ *  2. Execute o seeder a partir da raiz:
+ *         node seed.js
+ *
+ *  3. Saída esperada no terminal:
+ *         ✅ Coleção 'empresas' criada. Empresa ID: ...
+ *         ✅ Coleção 'candidatos' criada. Candidato ID: ...
+ *         ✅ Coleção 'vagas' criada. Vaga ID: ...
+ *         ✅ Coleção 'candidaturas' criada. Candidatura ID: ...
+ *         🚀 Todas as coleções, índices e dados mockados foram criados com sucesso!
+ *
+ *  4. (Opcional) Confira os dados no banco:
+ *         mongosh mongodb://localhost:27017/db_vagas --eval "db.vagas.find()"
+ *     Ou pelo MongoDB Compass conectando em mongodb://localhost:27017
+ *
+ *  USANDO OUTRAS URIs (OPCIONAL)
+ *  -----------------------------
+ *  Por padrão o script usa mongodb://localhost:27017/<banco>. Para apontar
+ *  para outro endereço, passe as variáveis de ambiente na execução:
+ *         DB_VAGAS=mongodb://outro-host:27017/db_vagas node seed.js
+ *  Variáveis aceitas: DB_EMPRESAS, DB_VAGAS, DB_CANDIDATOS, DB_CANDIDATURAS
+ *
+ *  PROBLEMAS COMUNS
+ *  ----------------
+ *  - "Cannot find module 'mongoose'"
+ *        -> Faltou o passo 1 (npm install mongoose na raiz).
+ *  - "connect ECONNREFUSED 127.0.0.1:27017"
+ *        -> O MongoDB não está rodando. Veja os pré-requisitos.
+ *  - "E11000 duplicate key error"
+ *        -> Conflito de índice único (CNPJ, e-mail ou candidatoId+vagaId).
+ *           Normalmente não acontece, pois o script limpa as coleções antes.
+ * ============================================================================
+ */
+
 const mongoose = require('mongoose');
 
 // URLs dos bancos de dados de cada microsserviço
