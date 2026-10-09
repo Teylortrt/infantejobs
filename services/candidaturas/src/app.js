@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const vagasRoutes = require('./routes/vagasRoutes');
+const candidaturasRoutes = require('./routes/candidaturasRoutes');
 
 const app = express();
 
@@ -15,8 +15,8 @@ app.get('/', (req, res) => {
 
 // Futuramente aqui entrarão as rotas:
 // const vagaRoutes = require('./src/routes/vagaRoutes');
-// app.use('/vagas', vagaRo
-app.use('/vagas', vagasRoutes)
+// app.use('/candidaturas', vagaRo
+app.use('/candidaturas', candidaturasRoutes)
 
 module.exports = app;
 
