@@ -39,6 +39,17 @@ const buscarVagaPorId = async (req, res) => {
             return res.status(404).json({erro: 'Vaga não encontrada'});
         }
 
+        /* ESPERARA SERVICE EMPRESA ESTAR PRONTO
+
+        // tenta buscar a empresa no serviço :3001
+        let empresa = null;
+        try {
+            empresa = await buscarEmpresaPorId(vaga.empresaId);
+        } catch {
+            console.warn ('Serviço de empresas fora do ar ou empresa não encontrada');
+        }
+        */
+
         // retorna a vaga em json
         return res.status(200).json(vaga)
 
