@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-const buscarEmpresaPorId = async (empresaId) => {
+const buscarVagaPorId = async (vagaID) => {
     try{
         const resposta = await axios.get(
-            `${process.env.EMPRESAS_SERVICE_URL}/${empresaId}`, //http://localhost3001/empresas/;id
+            `${process.env.VAGAS_SERVICE_URL}/${vagaID}`, //http://localhost3002/vagas/;id
             { timeout: 3000} // não deixa vagas travado esperando empresas
         );
         return resposta.data;
@@ -14,10 +14,10 @@ const buscarEmpresaPorId = async (empresaId) => {
         }
 
         //fora do ar, timeout, erro 500 de outro lado
-        const falha = new Error ('Serviço de empresas indisponível');
-        falha.code = 'EMPRESAS_INDISPONIVEL';
+        const falha = new Error ('Serviço de vagas indisponível');
+        falha.code = 'VAGAS_INDISPONIVEL';
         throw falha;
     }
 }
 
-module.exports = {buscarEmpresaPorId}
+module.exports = {buscarVagaPorId}
