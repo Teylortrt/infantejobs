@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vagas &amp; Carreiras &mdash; Vagas disponíveis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <main class="container">
+    <h1>Vagas disponíveis</h1>
+
+    <form id="form-filtros" class="filtros">
+      <div class="row">
+        <div class="three columns">
+          <label for="filtro-titulo">Título</label>
+          <input type="text" id="filtro-titulo" placeholder="Ex: Desenvolvedor" />
+        </div>
+        <div class="three columns">
+          <label for="filtro-cidade">Cidade</label>
+          <input type="text" id="filtro-cidade" placeholder="Ex: Porto Alegre" />
+        </div>
+        <div class="three columns">
+          <label for="filtro-modalidade">Modalidade</label>
+          <select id="filtro-modalidade">
+            <option value="">Todas</option>
+            <option value="Presencial">Presencial</option>
+            <option value="Hibrido">Híbrido</option>
+            <option value="Remoto">Remoto</option>
+          </select>
+        </div>
+        <div class="three columns">
+          <label for="filtro-empresa">Empresa</label>
+          <input type="text" id="filtro-empresa" placeholder="Nome da empresa" />
+        </div>
+      </div>
+      <button type="submit" class="button-primary">Filtrar</button>
+      <button type="button" id="btn-limpar-filtros" class="button">Limpar filtros</button>
+    </form>
+
+    <div id="alert-vagas" class="alert"></div>
+
+    <div id="lista-vagas">
+      <p class="estado-info">Carregando vagas...</p>
+    </div>
+  </main>
+
+  <div id="app-footer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/vagas.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vagas &amp; Carreiras &mdash; Candidatura</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <main class="container">
+    <h1>Candidatar-se a uma vaga</h1>
+
+    <div id="resumo-vaga"></div>
+
+    <div id="alert-candidatura" class="alert"></div>
+
+    <form id="form-candidatura" novalidate>
+      <div class="row">
+        <div class="twelve columns">
+          <label class="required" for="vagaId">Vaga</label>
+          <select id="vagaId" name="vagaId">
+            <option value="">Carregando vagas...</option>
+          </select>
+          <span class="campo-erro" id="erro-vagaId">Selecione a vaga desejada.</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="twelve columns">
+          <label class="required" for="candidatoId">Candidato</label>
+          <select id="candidatoId" name="candidatoId">
+            <option value="">Carregando candidatos...</option>
+          </select>
+          <span class="campo-erro" id="erro-candidatoId">Selecione o candidato.</span>
+          <p>
+            Ainda não possui cadastro?
+            <a href="candidato-cadastro.html">Cadastre-se como candidato</a>.
+          </p>
+        </div>
+      </div>
+
+      <button type="submit" class="button-primary">Enviar candidatura</button>
+      <button type="reset" class="button">Limpar</button>
+    </form>
+  </main>
+
+  <div id="app-footer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/candidatura.js"></script>
+</body>
+</html>
