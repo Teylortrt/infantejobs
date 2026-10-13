@@ -1,12 +1,4 @@
-# Plataforma de Vagas e Candidaturas (InfanteJobs)
-
-Projeto Integrador de uma plataforma web distribuída para publicação de vagas por empresas e envio de candidaturas por profissionais.
-
----
-
-## 📌 Visão Geral do Projeto
-
-O sistema foi concebido utilizando uma **arquitetura de microsserviços desacoplados**, com comunicação síncrona via **HTTP/REST (JSON)** entre serviços e banco de dados **MongoDB** isolado logicamente por domínio.
+acoplados**, com comunicação síncrona via **HTTP/REST (JSON)** entre serviços e banco de dados **MongoDB** isolado logicamente por domínio.
 
 ### 🛠️ Stack Tecnológica
 * **Backend:** Node.js, Express, Mongoose (MongoDB).
