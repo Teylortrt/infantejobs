@@ -9,7 +9,7 @@ const buscarCandidatoPorID = async (candidatoID) => {
         return resposta.data;
     } catch (erro){
         //candidatos respondeu, mas candidato nao existe
-        if (erro.response.status && [400,404].includes(erro.response.status)) {
+        if (erro.response && [400,404].includes(erro.response.status)) {
             return null
         }
 

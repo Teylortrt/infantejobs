@@ -8,8 +8,8 @@ const buscarVagaPorId = async (vagaID) => {
         );
         return resposta.data;
     } catch (erro) {
-        // empresa respondeu, mas a empresa não existe
-        if (erro.response.status && [400,404].includes(erro.response.status)) {
+        // vaga respondeu, mas a vaga não existe
+        if (erro.response && [400,404].includes(erro.response.status)) {
             return null;
         }
 
