@@ -3,16 +3,20 @@ const mongoose = require('mongoose');
 const CandidaturasSchema = new mongoose.Schema({
     candidatoId: {
         type: String,
-        required: [true, 'O título da vaga é obrigatório'],
-        trim: true //Para evitar espaços em branco entre o incio e final
+        required: [true, 'O ID do Candidato é obriatório'],
     },
     vagaId: { 
         type: String, 
-        required: [true, 'A descrição é obrigatória'] 
+        required: [true, 'O ID da vaga é obrigatório'] 
+    },
+    data: { 
+        type: Date, 
+        default: Date.now 
     },
     status: { 
-        type: Number, 
-        required: false
+        type: String, 
+        enum: ['ENVIADA', 'EM_ANALISE', 'APROVADA', 'REJEITADA'], 
+        default: 'ENVIADA' 
     }
     }, { timestamps: true });
 
