@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const CandidaturasSchema = new mongoose.Schema({
-    candidatoId: {
+    candidatoID: {
         type: String,
         required: [true, 'O ID do Candidato é obriatório'],
     },
-    vagaId: { 
+    vagaID: { 
         type: String, 
         required: [true, 'O ID da vaga é obrigatório'] 
     },
@@ -19,5 +19,9 @@ const CandidaturasSchema = new mongoose.Schema({
         default: 'ENVIADA' 
     }
     }, { timestamps: true });
+
+CandidaturasSchema.index({
+    candidatoID: 1, vagaID: 1},
+    {unique: true});
 
 module.exports = mongoose.model('Candidaturas', CandidaturasSchema);
