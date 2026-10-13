@@ -60,6 +60,7 @@ const candidatarParaVaga = async (req, res) => {
 
     } catch (erro){
         console.error(500)
+        return res.status(400).json({ erro: 'Erro ao criar candidatura', detalhes: erro.message });
     }
 }
 

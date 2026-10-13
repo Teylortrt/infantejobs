@@ -20,5 +20,8 @@ const CandidaturasSchema = new mongoose.Schema({
     }
     }, { timestamps: true });
 
+CandidaturasSchema.index({
+    candidatoID: 1, vagaID: 1},
+    {unique: true});
 
 module.exports = mongoose.model('Candidaturas', CandidaturasSchema);
