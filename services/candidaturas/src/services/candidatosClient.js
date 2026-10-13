@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const buscaCandidatoID = async (candidatoID) => {
+const buscarCandidatoPorID = async (candidatoID) => {
     try{
         const resposta = await axios.get(
             `${process.env.CANDIDATOS_SERVICE_URL}/${candidatoID}`, //Busca na porta 3003
@@ -20,4 +20,4 @@ const buscaCandidatoID = async (candidatoID) => {
     }
 }
 
-module.exports = {buscaCandidatoID}
+module.exports = {buscarCandidatoPorID}
