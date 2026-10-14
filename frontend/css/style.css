@@ -1,0 +1,179 @@
+/* Estilos complementares ao Skeleton CSS.
+   O Skeleton cobre o grid, tipografia e botões; aqui só ajustamos
+   detalhes específicos da plataforma de vagas. */
+
+:root {
+  --cor-primaria: #1565c0;
+  --cor-primaria-escura: #0d47a1;
+  --cor-sucesso: #2e7d32;
+  --cor-erro: #c62828;
+  --cor-aberta: #2e7d32;
+  --cor-fechada: #9e9e9e;
+  --cor-fundo-card: #ffffff;
+  --cor-borda: #e0e0e0;
+}
+
+body {
+  background-color: #f5f6f8;
+}
+
+/* Cabeçalho / navegação */
+.top-bar {
+  background-color: var(--cor-primaria);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+}
+
+.top-bar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.top-bar .brand {
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.top-bar nav a {
+  color: #e3f2fd;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.top-bar nav a:hover,
+.top-bar nav a.active {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Cards de vaga / candidato */
+.card {
+  background: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h4 {
+  margin-bottom: 0.5rem;
+}
+
+.card .meta {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge.status-aberta {
+  background-color: var(--cor-aberta);
+}
+
+.badge.status-fechada {
+  background-color: var(--cor-fechada);
+}
+
+.badge.status-enviada {
+  background-color: #1565c0;
+}
+
+.badge.status-em_analise {
+  background-color: #ef6c00;
+}
+
+.badge.status-aprovada {
+  background-color: var(--cor-sucesso);
+}
+
+.badge.status-rejeitada {
+  background-color: var(--cor-erro);
+}
+
+/* Mensagens de feedback (sucesso / erro) */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  display: none;
+}
+
+.alert.visible {
+  display: block;
+}
+
+.alert.alert-success {
+  background-color: #e8f5e9;
+  color: var(--cor-sucesso);
+  border: 1px solid #c8e6c9;
+}
+
+.alert.alert-error {
+  background-color: #ffebee;
+  color: var(--cor-erro);
+  border: 1px solid #ffcdd2;
+}
+
+/* Estado de carregamento / vazio */
+.estado-info {
+  text-align: center;
+  color: #777;
+  padding: 2rem 0;
+}
+
+/* Filtros de busca */
+.filtros {
+  background: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.filtros .row {
+  margin-bottom: 0;
+}
+
+/* Rodapé */
+footer.site-footer {
+  text-align: center;
+  color: #999;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+}
+
+/* Formulários */
+label.required::after {
+  content: " *";
+  color: var(--cor-erro);
+}
+
+.campo-erro {
+  color: var(--cor-erro);
+  font-size: 0.85rem;
+  display: none;
+}
+
+.campo-erro.visible {
+  display: block;
+}
+
+input.invalido,
+select.invalido,
+textarea.invalido {
+  border-color: var(--cor-erro) !important;
+}

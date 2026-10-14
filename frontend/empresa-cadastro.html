@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vagas &amp; Carreiras &mdash; Cadastro de empresa</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <main class="container">
+    <h1>Cadastro de empresa</h1>
+
+    <div id="alert-empresa" class="alert"></div>
+
+    <form id="form-empresa" novalidate>
+      <div class="row">
+        <div class="six columns">
+          <label class="required" for="nome">Nome da empresa</label>
+          <input type="text" id="nome" name="nome" maxlength="120" />
+          <span class="campo-erro" id="erro-nome">Informe o nome da empresa.</span>
+        </div>
+        <div class="six columns">
+          <label class="required" for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+          <span class="campo-erro" id="erro-cnpj">Informe um CNPJ válido (14 dígitos).</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="six columns">
+          <label class="required" for="email">E-mail</label>
+          <input type="email" id="email" name="email" />
+          <span class="campo-erro" id="erro-email">Informe um e-mail válido.</span>
+        </div>
+        <div class="six columns">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="six columns">
+          <label class="required" for="cidade">Cidade</label>
+          <input type="text" id="cidade" name="cidade" />
+          <span class="campo-erro" id="erro-cidade">Informe a cidade da empresa.</span>
+        </div>
+      </div>
+
+      <button type="submit" class="button-primary">Cadastrar empresa</button>
+      <button type="reset" class="button">Limpar</button>
+    </form>
+  </main>
+
+  <div id="app-footer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/empresa-cadastro.js"></script>
+</body>
+</html>

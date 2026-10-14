@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vagas &amp; Carreiras &mdash; Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <main class="container">
+    <section class="row" style="margin-top: 2rem;">
+      <div class="twelve columns">
+        <h1>Encontre a vaga ideal</h1>
+        <p>
+          Plataforma de vagas e candidaturas: empresas cadastram oportunidades,
+          candidatos pesquisam e se candidatam &mdash; tudo em um só lugar.
+        </p>
+        <a class="button button-primary" href="vagas.html">Ver vagas disponíveis</a>
+        <a class="button" href="candidato-cadastro.html">Cadastrar-me como candidato</a>
+      </div>
+    </section>
+
+    <section class="row" style="margin-top: 3rem;">
+      <div class="four columns">
+        <div class="card">
+          <h4 id="total-vagas">&mdash;</h4>
+          <p class="meta">Vagas abertas</p>
+        </div>
+      </div>
+      <div class="four columns">
+        <div class="card">
+          <h4 id="total-empresas">&mdash;</h4>
+          <p class="meta">Empresas cadastradas</p>
+        </div>
+      </div>
+      <div class="four columns">
+        <div class="card">
+          <h4 id="total-candidatos">&mdash;</h4>
+          <p class="meta">Candidatos cadastrados</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="row" style="margin-top: 1rem;">
+      <div class="twelve columns">
+        <h3>O que você deseja fazer?</h3>
+      </div>
+      <div class="four columns">
+        <div class="card">
+          <h5>Sou candidato</h5>
+          <p>Pesquise vagas por título, cidade ou modalidade e candidate-se em poucos cliques.</p>
+          <a class="button" href="vagas.html">Buscar vagas</a>
+        </div>
+      </div>
+      <div class="four columns">
+        <div class="card">
+          <h5>Sou empresa</h5>
+          <p>Cadastre sua empresa e publique novas oportunidades de trabalho.</p>
+          <a class="button" href="empresa-cadastro.html">Cadastrar empresa</a>
+        </div>
+      </div>
+      <div class="four columns">
+        <div class="card">
+          <h5>Gerenciar</h5>
+          <p>Publique uma vaga ou consulte a lista de candidatos cadastrados.</p>
+          <a class="button" href="vaga-cadastro.html">Publicar vaga</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="app-footer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>
