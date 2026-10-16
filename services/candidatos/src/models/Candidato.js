@@ -8,7 +8,6 @@ const candidatoSchema = new mongoose.Schema(
             required: [true, 'O nome do candidato é obrigatório'],
             trim: true
         },
-
         cpf: {
             type: String,
             required: [true, 'O CPF é obrigatório'],
@@ -16,7 +15,7 @@ const candidatoSchema = new mongoose.Schema(
             trim: true
         },
 
-        endereco: {
+        cidade: {
             type: String,
             required: [true, 'O endereço é obrigatório'],
             trim: true
@@ -24,14 +23,22 @@ const candidatoSchema = new mongoose.Schema(
 
         telefone: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         },
 
         email: {
             type: String,
             trim: true,
-            lowercase: true
+            lowercase: true,
+            required: true
+        },
+
+        habilidades: {
+            type: Array,
         }
+
+
     },
     {
         timestamps: true

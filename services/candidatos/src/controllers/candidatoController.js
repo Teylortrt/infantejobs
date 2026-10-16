@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Candidatura = require('../models/Candidato');
+const Candidato = require('../models/Candidato');
 
 //=========================
 //LISTAR CANDIDATOS//
@@ -46,18 +46,7 @@ const buscarCandidatoPorId = async (req, res) => {
 // POST /candidatos
 const criarCandidato = async (req, res) => {
     try {
-        const { nome, cpf, endereco, telefone, email } = req.body;
-    if (!nome || !cpf || !endereco || !telefone || !email) {
-        return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
-    }
-
-    const novoCandidato = new Candidato({ 
-        nome, 
-        cpf, 
-        endereco,
-        telefone,
-        email
-    });
+    const novoCandidato = await Candidato.create(req.body);
     return res.status(201).json(novoCandidato);
     }
     catch (erro) {
