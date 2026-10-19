@@ -53,28 +53,32 @@ const buscarCandidaturaPorID = async (req, res) => {
 const candidatarParaVaga = async (req, res) => {
     try{
         // IDs vindos do corpo da requisição (antes não eram declarados -> "vagaID is not defined")
-        const { vagaID, candidatoID } = req.body;
-        if (!vagaID || !candidatoID) {
-            return res.status(400).json({erro: 'vagaID e candidatoID são obrigatórios'});
+        const { vagaId, candidatoId } = req.body;
+        if (!vagaId || !candidatoId) {
+            return res.status(400).json({erro: 'vagaId e candidatoId são obrigatórios'});
         }
 
         // espaço para filtrar se existe ID da empresa
-        const vaga = await buscarVagaPorId(vagaID);
+        const vaga = await buscarVagaPorId(vagaId);
         if (!vaga) {
             return res.status(404).json({erro: 'Vaga não existente'});
         }
 
         //espaço para verificar se existe ID do candidato
-        const candidato = await buscarCandidatoPorID(candidatoID);
+        const candidato = await buscarCandidatoPorID(candidatoId);
         if (!candidato){
             return res.status(404).json({erro: "Candidato não existente"});
         }
 
+        const jaCandidatou = await Candidatura.exists({candidatoId, vagaId});
+        if (jaCandidatou) {
+            return res.status(409).json({erro: 'Candidato já foi cadastrado nesta vaga'})
+        }
         const novaCandidatura = await Candidatura.create({
             candidatoNome: candidato.nome,
-            candidatoID: String(candidato._id),
+            candidatoId: String(candidato._id),
             vagaNome: vaga.titulo,
-            vagaID: String(vaga._id)
+            vagaId: String(vaga._id)
 
         });
         return res.status(201).json(novaCandidatura)

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const CandidaturasSchema = new mongoose.Schema({
-    candidatoID: {
+    candidatoId: {
         type: String,
         required: [true, 'O ID do Candidato é obrigatório'],
     },
@@ -9,7 +9,7 @@ const CandidaturasSchema = new mongoose.Schema({
         type: String,
         required: [true, 'O nome do Candidato é obrigatório']
     },
-    vagaID: { 
+    vagaId: { 
         type: String, 
         required: [true, 'O ID da vaga é obrigatório'] 
     },
