@@ -28,7 +28,12 @@ const VagaSchema = new mongoose.Schema({
     }],
     empresaId: { 
         type: String, 
-        required: [true, 'O ID da empresa é obrigatório'] 
+        required: [true, 'O ID da empresa é obrigatório'],
+        index: true // Essencial para performance em buscas por empresa
+    },
+    empresaNome: {
+        type: String,
+        required: true
     },
     status: { 
         type: String, 

@@ -62,21 +62,27 @@ const buscarVagaPorId = async (req, res) => {
 //POST /vagas
 const criarVaga = async (req, res) => {
     try {
-        const { empresaId } = req.body;
-        if (!empresaId) {
-            return res.status(400).json({erro: 'empresaId é obrifatório'});
+        const { titulo, descricao, salario, modalidade, cidade, requisitos, empresaId } = req.body;
+        // 1. Fail-fast: valida presença e formato do ID sem gastar requisição HTTP
+        if (!empresaId || !mongoose.isValidObjectId(empresaId)) {
+            return res.status(400).json({ erro: 'empresaId inválido ou não informado' });
         }
-
-        /* Filtro de buscar empresa: precisa do service de empresa pronto
-
+        // 2. Valida existência no serviço de Empresas
         const empresa = await buscarEmpresaPorId(empresaId);
         if (!empresa) {
-            return res.status(400).json({ erro: 'Empresa informada não existe' });
-    }
-    */
-
-
-        const novaVaga = await Vaga.create(req.body);
+            return res.status(404).json({ erro: 'Empresa informada não existe' });
+        }
+        // 3. Cria a vaga apenas com campos permitidos + dados oficiais vindos do serviço de Empresas
+        const novaVaga = await Vaga.create({
+            titulo,
+            descricao,
+            salario,
+            modalidade,
+            cidade,
+            requisitos,
+            empresaId: String(empresa._id),
+            empresaNome: empresa.nome // Pega direto da fonte da verdade!
+        });
         return res.status(201).json(novaVaga);
     } catch (erro){
         if (erro.code === 'EMPRESAS_INDISPONIVEL') {
