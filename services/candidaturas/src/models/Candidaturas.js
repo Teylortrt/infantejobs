@@ -3,11 +3,19 @@ const mongoose = require('mongoose');
 const CandidaturasSchema = new mongoose.Schema({
     candidatoID: {
         type: String,
-        required: [true, 'O ID do Candidato é obriatório'],
+        required: [true, 'O ID do Candidato é obrigatório'],
+    },
+    candidatoNome: {
+        type: String,
+        required: [true, 'O nome do Candidato é obrigatório']
     },
     vagaID: { 
         type: String, 
         required: [true, 'O ID da vaga é obrigatório'] 
+    },
+    vagaNome: {
+        type: String,
+        required: [true, 'O nome da vaga é obrigatório']
     },
     data: { 
         type: Date, 

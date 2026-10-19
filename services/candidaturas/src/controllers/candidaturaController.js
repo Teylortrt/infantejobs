@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Candidatura = require('../models/Candidaturas');
 const { buscarVagaPorId } = require('../services/vagasClient');
 const { buscarCandidatoPorID } = require('../services/candidatosClient');
+const { buscarEmpresaPorId } = require('../../../vagas/src/services/empresaClient');
 
 // GET /candidaturas (aceita filtros: ?status=ENVIADA&candidatoID=:id)
 const listarCandidaturas = async (req, res) => {
@@ -51,17 +52,41 @@ const buscarCandidaturaPorID = async (req, res) => {
 // POST /candidaturas
 const candidatarParaVaga = async (req, res) => {
     try{
+        // IDs vindos do corpo da requisição (antes não eram declarados -> "vagaID is not defined")
+        const { vagaID, candidatoID } = req.body;
+        if (!vagaID || !candidatoID) {
+            return res.status(400).json({erro: 'vagaID e candidatoID são obrigatórios'});
+        }
+
         // espaço para filtrar se existe ID da empresa
+        const vaga = await buscarVagaPorId(vagaID);
+        if (!vaga) {
+            return res.status(404).json({erro: 'Vaga não existente'});
+        }
 
         //espaço para verificar se existe ID do candidato
+        const candidato = await buscarCandidatoPorID(candidatoID);
+        if (!candidato){
+            return res.status(404).json({erro: "Candidato não existente"});
+        }
 
-        const novaCandidatura = await Candidatura.create(req.body);
+        const novaCandidatura = await Candidatura.create({
+            candidatoNome: candidato.nome,
+            candidatoID: String(candidato._id),
+            vagaNome: vaga.titulo,
+            vagaID: String(vaga._id)
+
+        });
         return res.status(201).json(novaCandidatura)
 
     } catch (erro){
-        console.error(500)
+        console.error(erro)
+        if (erro.code === 'VAGAS_INDISPONIVEL' || erro.code === 'CANDIDATOS_INDISPONIVEL') {
+            return res.status(503).json({ erro: erro.message });
+        }
         return res.status(400).json({ erro: 'Erro ao criar candidatura', detalhes: erro.message });
     }
+
 }
 
 //PATCH /candidaturas/:id/status
