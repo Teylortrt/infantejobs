@@ -1,238 +1,342 @@
-acoplados**, com comunicação síncrona via **HTTP/REST (JSON)** entre serviços e banco de dados **MongoDB** isolado logicamente por domínio.
+# 💼 InfanteJobs — Plataforma de Vagas e Candidaturas
 
-### 🛠️ Stack Tecnológica
-* **Backend:** Node.js, Express, Mongoose (MongoDB).
-* **Frontend:** HTML5 semântico, CSS3, Skeleton CSS (grid de 12 colunas) e Vanilla JavaScript nativo (`fetch` e manipulação de DOM).
-* **Testes Automatizados:** Jest + Supertest (testes de integração no backend) e Cypress (testes de ponta a ponta E2E no frontend).
+Projeto Integrador: plataforma web para **empresas publicarem vagas** e **candidatos se inscreverem**, construída com uma arquitetura de **microsserviços desacoplados**. Os serviços se comunicam por **HTTP/REST (JSON)** e cada um possui seu próprio banco **MongoDB** (*database-per-service*).
+
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-Supertest-C21325?logo=jest&logoColor=white)
+![Cypress](https://img.shields.io/badge/Cypress-E2E-17202C?logo=cypress)
 
 ---
 
-## 🌐 Topologia de Microsserviços e Portas
+## 📑 Sumário
 
-O MongoDB roda como serviço único local na porta padrão `27017`, gerenciando 4 bancos lógicos isolados:
+1. [Visão geral](#-visão-geral)
+2. [Arquitetura](#-arquitetura)
+3. [Stack tecnológica](#-stack-tecnológica)
+4. [Estrutura do repositório](#-estrutura-do-repositório)
+5. [Como executar](#-como-executar)
+6. [Referência da API](#-referência-da-api)
+7. [Testando os serviços](#-testando-os-serviços)
+8. [Decisões de projeto](#-decisões-de-projeto)
+9. [Status e próximos passos](#-status-e-próximos-passos)
 
-| Microsserviço | Porta HTTP | Banco MongoDB (`MONGODB_URI`) | Responsabilidade Principal |
+---
+
+## 🎯 Visão geral
+
+| Perfil | O que pode fazer |
+| :--- | :--- |
+| **Empresa** | Cadastrar-se, publicar vagas, acompanhar e encerrar vagas. |
+| **Candidato** | Criar perfil profissional, buscar vagas (filtros por cidade, modalidade e status) e se candidatar. |
+
+---
+
+## 🏗️ Arquitetura
+
+```mermaid
+flowchart LR
+    FE["Frontend<br/>HTML + CSS + JS<br/>:5500"]
+
+    subgraph Servicos["Microsserviços (Node.js + Express)"]
+        EMP["empresas<br/>:3001"]
+        VAG["vagas<br/>:3002"]
+        CAN["candidatos<br/>:3003"]
+        CTR["candidaturas<br/>:3004"]
+    end
+
+    subgraph Mongo["MongoDB :27017"]
+        DB1[("db_empresas")]
+        DB2[("db_vagas")]
+        DB3[("db_candidatos")]
+        DB4[("db_candidaturas")]
+    end
+
+    FE --> EMP & VAG & CAN & CTR
+    EMP --- DB1
+    VAG --- DB2
+    CAN --- DB3
+    CTR --- DB4
+    VAG -. "valida empresa (HTTP)" .-> EMP
+    CTR -. "valida vaga (HTTP)" .-> VAG
+    CTR -. "valida candidato (HTTP)" .-> CAN
+```
+
+| Microsserviço | Porta | Banco | Responsabilidade |
 | :--- | :---: | :--- | :--- |
-| **`empresas`** | `3001` | `mongodb://localhost:27017/db_empresas` | CRUD de dados corporativos (nome, CNPJ, contato). |
-| **`vagas`** | `3002` | `mongodb://localhost:27017/db_vagas` | CRUD de vagas e ciclo de vida (`ABERTA`/`FECHADA`). Consulta `:3001` via HTTP para exibir dados da empresa em `GET /vagas/:id`. |
-| **`candidatos`** | `3003` | `mongodb://localhost:27017/db_candidatos` | CRUD de perfil profissional (dados pessoais, habilidades). |
-| **`candidaturas`** | `3004` | `mongodb://localhost:27017/db_candidaturas` | Registro de inscrições. Consulta `:3002` e `:3003` via HTTP para validar existência antes de salvar. |
+| **`Empresas`** | `3001` | `db_empresas` | CRUD de empresas (nome, CNPJ, contato). |
+| **`vagas`** | `3002` | `db_vagas` | CRUD de vagas e ciclo de vida (`ABERTA` → `FECHADA`). Valida a empresa consultando `:3001`. |
+| **`candidatos`** | `3003` | `db_candidatos` | CRUD de perfis de candidatos (dados pessoais e habilidades). |
+| **`candidaturas`** | `3004` | `db_candidaturas` | Registro e acompanhamento de inscrições. Valida vaga (`:3002`) e candidato (`:3003`). |
 
 ---
 
-## 📂 Organização do Repositório
+## 🛠️ Stack tecnológica
+
+* **Backend:** Node.js, Express 5, Mongoose, Axios (comunicação entre serviços), CORS, dotenv.
+* **Frontend:** HTML5 semântico, CSS3 e JavaScript nativo (`fetch` + DOM), sem framework.
+* **Testes:** Jest + Supertest (integração no backend) e Cypress (E2E no frontend).
+* **Banco de dados:** MongoDB (um banco lógico por serviço).
+
+---
+
+## 📂 Estrutura do repositório
 
 ```text
-plataforma-vagas/
-│
-├── .gitignore
+infantejobs/
 ├── README.md
-├── seed.js                          # Carga inicial e mock dos bancos de dados
-│
-├── frontend/
-│   ├── index.html                   # Página inicial / Home
-│   ├── vagas.html                   # Listagem e busca de vagas
-│   ├── vaga-detalhes.html           # Detalhes da vaga e dados da empresa
-│   ├── cadastro-empresa.html        # Formulário de criação de empresa
-│   ├── cadastro-vaga.html           # Formulário de criação de vaga
-│   ├── cadastro-candidato.html      # Formulário de cadastro de candidato
-│   ├── candidatos.html              # Listagem e consulta de candidatos
-│   ├── candidatar.html              # Formulário de candidatura
-│   │
-│   ├── css/
-│   │   ├── normalize.css            # CSS reset do Skeleton
-│   │   ├── skeleton.css             # Grid responsivo e tipografia base
-│   │   └── custom.css               # Estilos complementares do projeto
-│   │
-│   └── js/
-│       ├── api.js                   # Configuração base das URLs das APIs
-│       ├── empresas.js              # Fetch e DOM para empresas
-│       ├── vagas.js                 # Fetch e DOM para listagem e detalhes
-│       ├── candidatos.js            # Fetch e DOM para candidatos
-│       └── candidaturas.js          # Fetch e DOM para envio de candidaturas
-│
-├── services/
-│   │
-│   ├── empresas/                    # Microsserviço 1 (Porta 3001)
-│   │   ├── src/
-│   │   │   ├── config/
-│   │   │   │   └── database.js      # Conexão Mongoose com db_empresas
-│   │   │   ├── controllers/
-│   │   │   │   └── empresaController.js
-│   │   │   ├── models/
-│   │   │   │   └── Empresa.js       # Schema: nome, cnpj, email, telefone, cidade
-│   │   │   ├── routes/
-│   │   │   │   └── empresaRoutes.js # GET, POST, PUT, DELETE /empresas
-│   │   │   └── app.js               # Middlewares (cors, json) e rotas para Jest
-│   │   ├── tests/
-│   │   │   └── empresas.test.js     # Testes de integração Jest + Supertest
-│   │   ├── .env.example
-│   │   ├── package.json
-│   │   └── server.js                # Inicializa app.listen(3001)
-│   │
-│   ├── vagas/                       # Microsserviço 2 (Porta 3002)
-│   │   ├── src/
-│   │   │   ├── config/
-│   │   │   │   └── database.js      # Conexão Mongoose com db_vagas
-│   │   │   ├── controllers/
-│   │   │   │   └── vagaController.js
-│   │   │   ├── models/
-│   │   │   │   └── Vaga.js          # Schema: titulo, salario, empresaId, status...
-│   │   │   ├── routes/
-│   │   │   │   └── vagaRoutes.js    # GET, POST, PUT, DELETE /vagas
-│   │   │   ├── services/
-│   │   │   │   └── empresaClient.js # Fetch HTTP interno: busca empresa na porta 3001
-│   │   │   └── app.js
-│   │   ├── tests/
-│   │   │   └── vagas.test.js
-│   │   ├── .env.example
-│   │   ├── package.json
-│   │   └── server.js                # Inicializa app.listen(3002)
-│   │
-│   ├── candidatos/                  # Microsserviço 3 (Porta 3003)
-│   │   ├── src/
-│   │   │   ├── config/
-│   │   │   │   └── database.js      # Conexão Mongoose com db_candidatos
-│   │   │   ├── controllers/
-│   │   │   │   └── candidatoController.js
-│   │   │   ├── models/
-│   │   │   │   └── Candidato.js     # Schema: nome, email, telefone, cidade, habilidades
-│   │   │   ├── routes/
-│   │   │   │   └── candidatoRoutes.js # GET, POST, PUT, DELETE /candidatos
-│   │   │   └── app.js
-│   │   ├── tests/
-│   │   │   └── candidatos.test.js
-│   │   ├── .env.example
-│   │   ├── package.json
-│   │   └── server.js                # Inicializa app.listen(3003)
-│   │
-│   └── candidaturas/                # Microsserviço 4 (Porta 3004)
-│       ├── src/
-│       │   ├── config/
-│       │   │   └── database.js      # Conexão Mongoose com db_candidaturas
-│       │   ├── controllers/
-│       │   │   └── candidaturaController.js
-│       │   ├── models/
-│       │   │   └── Candidatura.js   # Schema: candidatoId, vagaId, data, status
-│       │   ├── routes/
-│       │   │   └── candidaturaRoutes.js # GET, POST, PUT, DELETE /candidaturas
-│       │   ├── services/
-│       │   │   ├── vagaClient.js    # Fetch HTTP: valida se a vaga existe (porta 3002)
-│       │   │   └── candidatoClient.js # Fetch HTTP: valida se o candidato existe (porta 3003)
-│       │   └── app.js
-│       ├── tests/
-│       │   └── candidaturas.test.js
-│       ├── .env.example
-│       ├── package.json
-│       └── server.js                # Inicializa app.listen(3004)
-│
-└── cypress/
-    ├── e2e/
-    │   ├── empresas.cy.js           # E2E: Cadastro e listagem de empresas
-    │   ├── vagas.cy.js              # E2E: Criação e visualização de vagas
-    │   ├── candidatos.cy.js         # E2E: Cadastro de candidatos
-    │   └── candidatura-fluxo.cy.js  # E2E: Fluxo completo (selecionar vaga -> candidatar-se -> sucesso)
-    ├── fixtures/
-    │   └── dados-teste.json         # Dados estáticos simulados para os testes E2E
-    ├── support/
-    │   ├── commands.js
-    │   └── e2e.js
-    ├── cypress.config.js
-    └── package.json                 # Dependência isolada do Cypress na raiz
+├── seed.js                      # Popula os 4 bancos com dados de exemplo
+├── package.json                 # Scripts do frontend e do Cypress
+├── cypress.config.js
+├── cypress/e2e/                 # Testes E2E (cadastro de empresa, candidatura)
+├── frontend/                    # Páginas HTML, css/style.css e js/ (api.js centraliza as chamadas)
+│   └── README.md                # Guia específico do frontend
+└── services/
+    ├── Empresas/                # :3001
+    ├── vagas/                   # :3002
+    ├── candidatos/              # :3003
+    └── candidaturas/            # :3004
+        ├── server.js            # Conecta ao MongoDB e executa app.listen()
+        ├── src/
+        │   ├── app.js           # Express, middlewares e rotas (exporta app p/ testes)
+        │   ├── config/db.js     # Conexão Mongoose
+        │   ├── controllers/
+        │   ├── models/
+        │   ├── routes/
+        │   └── services/        # Clientes HTTP para outros microsserviços
+        └── tests/               # Jest + Supertest
 ```
 
----
-
-## 🧪 Como Preparar e Executar o Ambiente de Testes
-
-Cada microsserviço possui sua própria suíte de testes automatizados utilizando **Jest** e **Supertest**.
-
-### 1. Pré-requisito de Arquitetura (`app.js` vs `server.js`)
-Para que o Supertest consiga testar as rotas em memória sem conflito de portas de rede (TCP):
-* **`app.js`**: Instancia o Express, configura middlewares e rotas, e exporta a instância (`module.exports = app;`) sem executar `app.listen()`.
-* **`server.js`**: Importa o `app`, conecta ao MongoDB e executa o `app.listen(PORT)`.
+> Separar `app.js` de `server.js` permite que o Supertest teste as rotas em memória, sem abrir portas de rede.
 
 ---
 
-### 2. Instalação das Dependências de Teste
-Entre na pasta do microsserviço que deseja testar (por exemplo, `services/vagas`):
+## 🚀 Como executar
+
+### 1. Pré-requisitos
+* **Node.js** 18+ e **npm**
+* **MongoDB** na porta `27017`:
+  ```bash
+  sudo systemctl start mongod
+  # ou, com Docker:
+  docker run -d --name mongo -p 27017:27017 mongo:7
+  ```
+
+### 2. Variáveis de ambiente
+Crie um `.env` em cada pasta `services/<servico>/` (o `.env` não é versionado):
+
+| Serviço | `PORT` | `MONGODB_URI` | URLs internas |
+| :--- | :---: | :--- | :--- |
+| `Empresas` | `3001` | `mongodb://localhost:27017/db_empresas` | — |
+| `vagas` | `3002` | `mongodb://localhost:27017/db_vagas` | `EMPRESAS_SERVICE_URL=http://localhost:3001/empresas` |
+| `candidatos` | `3003` | `mongodb://localhost:27017/db_candidatos` | — |
+| `candidaturas` | `3004` | `mongodb://localhost:27017/db_candidaturas` | `VAGAS_SERVICE_URL=http://localhost:3002/vagas`<br>`CANDIDATOS_SERVICE_URL=http://localhost:3003/candidatos` |
+
+### 3. Subir os microsserviços
+Um terminal por serviço, nesta ordem (há dependência entre eles):
 
 ```bash
-cd services/<nome-do-servico>
-npm install -D jest supertest
+cd services/Empresas     && npm install && npm run dev   # :3001
+cd services/vagas        && npm install && npm run dev   # :3002
+cd services/candidatos   && npm install && npm run dev   # :3003
+cd services/candidaturas && npm install && npm run dev   # :3004
 ```
 
-* **`jest`**: Test runner e biblioteca de asserções (`describe`, `it`, `expect`).
-* **`supertest`**: Simula requisições HTTP (`GET`, `POST`, `PUT`, `DELETE`) diretamente contra o `app.js` em memória.
+### 4. (Opcional) Popular o banco com dados de exemplo
+Na raiz do projeto:
+```bash
+npm install mongoose   # apenas na primeira vez
+node seed.js
+```
+> ⚠️ O `seed.js` **apaga** os registros existentes das coleções antes de inserir. Use apenas em ambiente local.
+
+### 5. Subir o frontend
+Na raiz do projeto:
+```bash
+npm install
+npm run serve:frontend   # http://localhost:5500
+```
+Veja também o [guia do frontend](frontend/README.md).
 
 ---
 
-### 3. Configuração do `package.json`
-Verifique se o script `"test"` está configurado no `package.json` do respectivo serviço:
+## 📡 Referência da API
 
-```json
-"scripts": {
-  "test": "jest",
-  "start": "node server.js",
-  "dev": "node --watch server.js"
-}
-```
+| Serviço | Método | Rota | Descrição |
+| :--- | :---: | :--- | :--- |
+| Empresas | `GET` | `/empresas` | Lista empresas |
+| | `GET` | `/empresas/:id` | Busca por ID |
+| | `POST` | `/empresas` | Cria empresa |
+| | `PUT` | `/empresas/:id` | Atualiza empresa |
+| | `DELETE` | `/empresas/:id` | Remove empresa |
+| Vagas | `GET` | `/vagas` | Lista vagas (`?status=&modalidade=&cidade=&empresaId=`) |
+| | `GET` | `/vagas/:id` | Busca por ID |
+| | `POST` | `/vagas` | Cria vaga (valida `empresaId` no serviço de Empresas) |
+| | `PUT` | `/vagas/:id` | Atualiza vaga |
+| | `PATCH` | `/vagas/:id/fechar` | Fecha a vaga (`ABERTA` → `FECHADA`) |
+| | `DELETE` | `/vagas/:id` | Remove vaga |
+| Candidatos | `GET` | `/candidatos` | Lista candidatos |
+| | `GET` | `/candidatos/:id` | Busca por ID |
+| | `POST` | `/candidatos` | Cria candidato |
+| | `PATCH` | `/candidatos/:id` | Atualiza candidato |
+| | `DELETE` | `/candidatos/:id` | Remove candidato |
+| Candidaturas | `GET` | `/candidaturas` | Lista (`?candidatoID=&vagaID=&status=&data=`) |
+| | `GET` | `/candidaturas/:id` | Busca por ID |
+| | `POST` | `/candidaturas` | Candidata-se a uma vaga |
+| | `PATCH` | `/candidaturas/:id/status` | Atualiza o status |
+| | `DELETE` | `/candidaturas/:id` | Cancela candidatura |
+
+**Status de candidatura:** `ENVIADA`, `EM_ANALISE`, `APROVADA`, `REJEITADA`.
 
 ---
 
-### 4. Estrutura Padrão do Arquivo de Teste (`tests/<servico>.test.js`)
-Para serviços que interagem com o banco de dados MongoDB, utilize a estrutura de ciclo de vida abaixo:
+## 🧪 Testando os serviços
+
+### Testes automatizados
+
+```bash
+# Backend (por serviço): Jest + Supertest
+cd services/vagas && npm test
+npm test -- --watch            # modo interativo
+npm test -- --detectOpenHandles # diagnostica conexões pendentes
+
+# Frontend E2E (na raiz): Cypress
+npm run cypress:open           # modo interativo
+npm run test:e2e               # headless (sobe o frontend automaticamente)
+```
+
+Estrutura básica de um teste de integração:
 
 ```javascript
-// 1. Carrega as variáveis de ambiente
 require('dotenv').config({ quiet: true });
-
 const mongoose = require('mongoose');
-const os = require('os'); // Evita timeout do driver do MongoDB na sandbox do Jest (Mongoose 9)
+const os = require('os'); // evita timeout do driver na sandbox do Jest (Mongoose 9)
 const request = require('supertest');
 const app = require('../src/app');
 
-describe('Suíte de Testes do Microsserviço', () => {
+describe('Microsserviço', () => {
+  beforeAll(() => mongoose.connect(process.env.MONGODB_URI, { runtimeAdapters: { os } }));
+  afterAll(() => mongoose.connection.close());
 
-  // 2. Conecta ao banco antes de rodar os testes
-  beforeAll(async () => {
-    await mongoose.connect(process.env.MONGODB_URI, { 
-      runtimeAdapters: { os } 
-    });
-  });
-
-  // 3. Fecha a conexão ao finalizar para encerrar handles abertos
-  afterAll(async () => {
-    await mongoose.connection.close();
-  });
-
-  // 4. Casos de Teste
-  it('Deve responder 200 na rota base /', async () => {
-    const res = await request(app).get('/');
+  it('lista recursos', async () => {
+    const res = await request(app).get('/vagas');
     expect(res.statusCode).toBe(200);
   });
-
 });
+```
+
+### Teste manual do fluxo completo (curl)
+
+Com os 4 serviços no ar, execute em ordem e guarde os `_id` retornados.
+
+**1. Criar empresa**
+```bash
+curl -X POST http://localhost:3001/empresas -H "Content-Type: application/json" \
+  -d '{"nome":"Acme Ltda","cnpj":"12345678000199","cidade":"São Paulo","endereco":"Rua A, 100","telefone":"11999999999","email":"contato@acme.com"}'
+```
+
+**2. Criar vaga** (usa o `_id` da empresa)
+```bash
+curl -X POST http://localhost:3002/vagas -H "Content-Type: application/json" \
+  -d '{"titulo":"Dev Node.js","descricao":"API REST com Express","salario":8000,"modalidade":"Remoto","cidade":"São Paulo","requisitos":["Node.js","MongoDB"],"empresaId":"<ID_DA_EMPRESA>"}'
+```
+
+**3. Criar candidato**
+```bash
+curl -X POST http://localhost:3003/candidatos -H "Content-Type: application/json" \
+  -d '{"nome":"Maria Silva","cpf":"12345678900","cidade":"São Paulo","telefone":"11988888888","email":"maria@email.com","habilidades":["JavaScript","Node.js"]}'
+```
+
+**4. Candidatar-se**
+```bash
+curl -X POST http://localhost:3004/candidaturas -H "Content-Type: application/json" \
+  -d '{"candidatoID":"<ID_DO_CANDIDATO>","vagaID":"<ID_DA_VAGA>"}'
+```
+
+**5. Consultar e alterar**
+```bash
+curl "http://localhost:3002/vagas?status=ABERTA&modalidade=Remoto"
+curl http://localhost:3002/vagas/<ID_DA_VAGA>
+curl -X PATCH http://localhost:3002/vagas/<ID_DA_VAGA>/fechar
+curl -X PATCH http://localhost:3004/candidaturas/<ID_DA_CANDIDATURA>/status \
+  -H "Content-Type: application/json" -d '{"status":"EM_ANALISE"}'
+```
+
+### Cenários de erro (validam a integração entre serviços)
+
+| Teste | Ação | Resposta esperada |
+| :--- | :--- | :---: |
+| Vaga sem `empresaId` | `POST /vagas` sem o campo | `400` |
+| Empresa inexistente | `POST /vagas` com ObjectId válido que não existe | `400` / `404` |
+| Serviço de Empresas fora do ar | Parar `:3001` e fazer `POST /vagas` | `503` |
+| ID malformado | `GET /vagas/abc` | `400` |
+| Vaga inexistente | `GET /vagas/<ObjectId inexistente>` | `404` |
+| Fechar vaga já fechada | `PATCH /vagas/:id/fechar` duas vezes | `409` |
+| Candidatura duplicada | Repetir `POST /candidaturas` com mesmo par | erro (índice único) |
+| CNPJ / CPF duplicado | Repetir `POST` de empresa / candidato | erro (chave única) |
+
+> Dica: para ver só o status HTTP, adicione `-s -o /dev/null -w "%{http_code}\n"` ao `curl`.
+
+### Inspecionando o MongoDB
+```bash
+mongosh
+> show dbs
+> use db_vagas
+> db.vagas.find().pretty()
 ```
 
 ---
 
-### 5. Executando os Testes
+## 🧠 Decisões de projeto
 
-Dentro da pasta do microsserviço:
+* **Database-per-service:** cada microsserviço é dono dos seus dados; não há *foreign keys* nem `populate()` entre bancos. Os relacionamentos são feitos por **IDs de referência** (`empresaId`, `vagaID`, `candidatoID`).
+* **Integridade referencial via HTTP:** antes de gravar, o serviço consumidor valida a existência da entidade externa por um cliente HTTP (`empresaClient.js`, `vagasClient.js`, `candidatosClient.js`).
+* **Resiliência:** chamadas entre serviços usam *timeout* (3s) e traduzem falhas de rede em `503 Service Unavailable`, diferenciando "recurso não existe" de "serviço indisponível".
+* **Frontend desacoplado:** todas as chamadas HTTP passam por `frontend/js/api.js`, e as URLs base são configuráveis.
+* **Testabilidade:** separação `app.js` / `server.js` para testes de integração sem portas de rede.
 
-* **Executar todos os testes uma vez:**
-  ```bash
-  npm test
-  ```
+---
 
-* **Modo interativo (re-executa automaticamente ao salvar arquivos):**
-  ```bash
-  npm test -- --watch
-  ```
+## 🗺️ Status e próximos passos
 
-* **Diagnosticar operações assíncronas ou conexões pendentes:**
-  ```bash
-  npm test -- --detectOpenHandles
-  ```
+- [x] CRUD de Empresas, Vagas e Candidatos
+- [x] Ciclo de vida da vaga (`ABERTA` / `FECHADA`)
+- [x] Validação de empresa na criação de vaga (comunicação entre serviços)
+- [x] Frontend com integração às APIs e testes E2E iniciais
+- [ ] Validar existência de vaga e candidato em `POST /candidaturas`
+- [ ] Enriquecer `GET /candidaturas/:id` com dados da vaga e do candidato
+- [ ] Armazenar `empresaNome` na vaga (*data snapshot*) para evitar chamadas em listagens
+- [ ] Autenticação (JWT) e autorização por perfil
+- [ ] Containerização com Docker Compose
+- [ ] Cobertura de testes para `candidatos`
+
+---
+
+## 👥 Equipe
+
+Projeto desenvolvido como Projeto Integrador.
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Teylortrt">
+        <img src="https://github.com/Teylortrt.png?size=120" width="100" alt="Foto de Teylortrt"/><br />
+        <sub><b>Teylortrt</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/fitofossil">
+        <img src="https://github.com/fitofossil.png?size=120" width="100" alt="Foto de fitofossil"/><br />
+        <sub><b>fitofossil</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Jpl200586">
+        <img src="https://github.com/Jpl200586.png?size=120" width="100" alt="Foto de Jpl200586"/><br />
+        <sub><b>Jpl200586</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
