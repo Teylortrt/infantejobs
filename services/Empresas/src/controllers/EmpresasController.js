@@ -46,20 +46,20 @@ const buscarEmpresaPorId = async (req, res) => {
 // POST /empresas
 const criarEmpresa = async (req, res) => {
     try {
-        const { nome, cnpj, cidade, endereco, telefone, email } = req.body;
-    if (!nome || !cnpj || !cidade || !endereco) {
+        const { nome, cnpj, cidade, telefone, email } = req.body;
+    if (!nome || !cnpj || !cidade) {
         return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
     }
 
-    const novaEmpresa = new Empresa({ 
+    const novaEmpresa = await Empresa.create({ 
         nome, 
         cnpj, 
         cidade,
-        endereco,
         telefone,
         email
     });
     return res.status(201).json(novaEmpresa);
+
     }
     catch (erro) {
         console.error(erro);

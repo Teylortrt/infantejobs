@@ -22,12 +22,6 @@ const empresaSchema = new mongoose.Schema(
             trim: true
         },
 
-        endereco: {
-            type: String,
-            required: [true, 'O endereço é obrigatório'],
-            trim: true
-        },
-
         telefone: {
             type: String,
             trim: true

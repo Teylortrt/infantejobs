@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Candidatura = require('../models/Candidaturas');
 const { buscarVagaPorId } = require('../services/vagasClient');
 const { buscarCandidatoPorID } = require('../services/candidatosClient');
+const { buscarEmpresaPorId } = require('../../../vagas/src/services/empresaClient');
 
 // GET /candidaturas (aceita filtros: ?status=ENVIADA&candidatoID=:id)
 const listarCandidaturas = async (req, res) => {
@@ -51,17 +52,45 @@ const buscarCandidaturaPorID = async (req, res) => {
 // POST /candidaturas
 const candidatarParaVaga = async (req, res) => {
     try{
+        // IDs vindos do corpo da requisição (antes não eram declarados -> "vagaID is not defined")
+        const { vagaId, candidatoId } = req.body;
+        if (!vagaId || !candidatoId) {
+            return res.status(400).json({erro: 'vagaId e candidatoId são obrigatórios'});
+        }
+
         // espaço para filtrar se existe ID da empresa
+        const vaga = await buscarVagaPorId(vagaId);
+        if (!vaga) {
+            return res.status(404).json({erro: 'Vaga não existente'});
+        }
 
         //espaço para verificar se existe ID do candidato
+        const candidato = await buscarCandidatoPorID(candidatoId);
+        if (!candidato){
+            return res.status(404).json({erro: "Candidato não existente"});
+        }
 
-        const novaCandidatura = await Candidatura.create(req.body);
+        const jaCandidatou = await Candidatura.exists({candidatoId, vagaId});
+        if (jaCandidatou) {
+            return res.status(409).json({erro: 'Candidato já foi cadastrado nesta vaga'})
+        }
+        const novaCandidatura = await Candidatura.create({
+            candidatoNome: candidato.nome,
+            candidatoId: String(candidato._id),
+            vagaNome: vaga.titulo,
+            vagaId: String(vaga._id)
+
+        });
         return res.status(201).json(novaCandidatura)
 
     } catch (erro){
-        console.error(500)
+        console.error(erro)
+        if (erro.code === 'VAGAS_INDISPONIVEL' || erro.code === 'CANDIDATOS_INDISPONIVEL') {
+            return res.status(503).json({ erro: erro.message });
+        }
         return res.status(400).json({ erro: 'Erro ao criar candidatura', detalhes: erro.message });
     }
+
 }
 
 //PATCH /candidaturas/:id/status
