@@ -30,14 +30,16 @@
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const cidade = document.getElementById("cidade").value.trim();
+    const cpf = document.getElementById("cpf").value.trim();
     const curriculoUrl = document.getElementById("curriculoUrl").value.trim();
 
     const nomeOk = marcarCampo("nome", "erro-nome", nome.length > 0);
     const emailOk = marcarCampo("email", "erro-email", emailValido(email));
     const cidadeOk = marcarCampo("cidade", "erro-cidade", cidade.length > 0);
+    const cpfOk = marcarCampo("cpf", "erro-cpf", /^(\d{3}\.?\d{3}\.?\d{3}-?\d{2})$/.test(document.getElementById("cpf").value.trim()));
     const curriculoOk = marcarCampo("curriculoUrl", "erro-curriculoUrl", urlValida(curriculoUrl));
 
-    return nomeOk && emailOk && cidadeOk && curriculoOk;
+    return nomeOk && emailOk && cidadeOk && cpfOk && curriculoOk;
   }
 
   async function enviarFormulario(ev) {
@@ -55,6 +57,7 @@
       email: document.getElementById("email").value.trim(),
       telefone: document.getElementById("telefone").value.trim(),
       cidade: document.getElementById("cidade").value.trim(),
+      cpf: document.getElementById("cpf").value.trim(),
       habilidades: habilidadesTexto
         ? habilidadesTexto.split(",").map((h) => h.trim()).filter(Boolean)
         : [],
