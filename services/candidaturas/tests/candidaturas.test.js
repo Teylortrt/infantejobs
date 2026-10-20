@@ -23,6 +23,28 @@ describe('Suíte de Testes do Microsserviço de candidaturas', () => {
 
     // ----------- TESTES ----------- \\
 
-    
+    it('Deve responder 200 na rota base/', async () => {
+        const res = await request(app).get('/');
+        expect(res.statusCode).toBe(200);
+    })
+
+    it('Deve responder 200 e retornar um array', async () => {
+        const res = await request(app).get('/candidaturas');
+        expect(res.statusCode).toBe(200);
+
+    })
+
+        // Teste 3: Validação ao criar vaga sem campos obrigatórios
+    it('Deve retornar 400 ao tentar criar vaga sem dados obrigatórios', async () => {
+        const res = await request(app).post('/candidaturas').send({}); //Corpo vazio
+        expect(res.statusCode).toBe(400);
+    })
+
+    // Teste 4: Validação de ID inválido
+    it('Deve retornar 400 se o ID for incorreto no MongoDB', async () =>{
+        const res = await request(app).get('/candidaturas/id-invalido-123');
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('erro', 'Candidatura não encontrada');
+    });
 
   });

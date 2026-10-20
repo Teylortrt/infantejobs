@@ -25,18 +25,15 @@ describe("Fluxo de candidatura", () => {
     telefone: "(51) 3333-4444",
     cidade: "Porto Alegre",
   };
-  const candidatoMock = { id: "c1", nome: "João Silva", email: "joao@email.com" };
+  const candidatoMock = { id: "c1", nome: "João Silva", email: "joao@email.com", cpf:"01234567890", telefone: "51 999999999"};
 
   beforeEach(() => {
-    cy.intercept("GET", "**/vagas*", { body: [vagaMock] }).as("listarVagas");
-    cy.intercept("GET", "**/vagas/1", { body: vagaMock }).as("obterVaga");
-    cy.intercept("GET", "**/empresas*", { body: [empresaMock] }).as("listarEmpresas");
-    cy.intercept("GET", "**/empresas/e1", { body: empresaMock }).as("obterEmpresa");
-    cy.intercept("GET", "**/candidatos*", { body: [candidatoMock] }).as("listarCandidatos");
-    cy.intercept("POST", "**/candidaturas", {
-      statusCode: 201,
-      body: { id: "cand1", status: "ENVIADA" },
-    }).as("criarCandidatura");
+    cy.intercept("GET", "http://localhost:3002/vagas*", { body: [vagaMock] }).as("listarVagas");
+    cy.intercept("GET", "http://localhost:3002/vagas/1", { body: vagaMock }).as("obterVaga");
+    cy.intercept("GET", "http://localhost:3001/empresas*", { body: [empresaMock] }).as("listarEmpresas");
+    cy.intercept("GET", "http://localhost:3001/empresas/e1", { body: empresaMock }).as("obterEmpresa");
+    cy.intercept("GET", "http://localhost:3003/candidatos*", { body: [candidatoMock] }).as("listarCandidatos");
+    cy.intercept("POST", "http://localhost:3004/candidaturas", { statusCode: 201, body: { id: "cand1", status: "ENVIADA" } }).as("criarCandidatura");
   });
 
   it("permite abrir uma vaga, candidatar-se e ver a mensagem de sucesso", () => {

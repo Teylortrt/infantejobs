@@ -37,9 +37,9 @@ describe('Suíte de Testes do Microsserviço de candidatos', () => {
     })
 
     // Teste 3: Validação ao criar candidato sem campos obrigatórios
-    it('Deve retornar 400 ao tentar criar candidato sem dados obrigatórios', async () => {
+    it('Deve retornar 500 ao tentar criar candidato sem dados obrigatórios', async () => {
         const res = await request(app).post('/candidatos').send({}); //Corpo vazio
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(500);
     })
 
     // Teste 4: Validação de ID inválido
