@@ -24,15 +24,17 @@
   function validarFormulario() {
     const nome = document.getElementById("nome").value.trim();
     const cnpj = apenasDigitos(document.getElementById("cnpj").value);
+    const cpf = apenasDigitos(document.getElementById("cpf").value);
     const email = document.getElementById("email").value.trim();
     const cidade = document.getElementById("cidade").value.trim();
 
     const nomeOk = marcarCampo("nome", "erro-nome", nome.length > 0);
     const cnpjOk = marcarCampo("cnpj", "erro-cnpj", cnpj.length === 14);
+    const cpfOk = marcarCampo("cpf", "erro-cpf", !cpf || cpf.length === 11);
     const emailOk = marcarCampo("email", "erro-email", emailValido(email));
     const cidadeOk = marcarCampo("cidade", "erro-cidade", cidade.length > 0);
 
-    return nomeOk && cnpjOk && emailOk && cidadeOk;
+    return nomeOk && cnpjOk && cpfOk && emailOk && cidadeOk;
   }
 
   async function enviarFormulario(ev) {
@@ -47,6 +49,7 @@
     const dados = {
       nome: document.getElementById("nome").value.trim(),
       cnpj: apenasDigitos(document.getElementById("cnpj").value),
+      cpf: apenasDigitos(document.getElementById("cpf").value) || undefined,
       email: document.getElementById("email").value.trim(),
       telefone: document.getElementById("telefone").value.trim(),
       cidade: document.getElementById("cidade").value.trim(),

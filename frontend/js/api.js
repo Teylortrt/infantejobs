@@ -56,7 +56,7 @@
     const body = isJson ? await response.json().catch(() => null) : null;
 
     if (!response.ok) {
-      const message = (body && (body.message || body.error)) || `Erro HTTP ${response.status}`;
+      const message = (body && (body.message || body.error || body.erro)) || `Erro HTTP ${response.status}`;
       const err = new Error(message);
       err.status = response.status;
       err.details = body;
@@ -105,7 +105,7 @@
       criar: (dados) =>
         request(`${API_BASE.candidatos}/candidatos`, { method: "POST", body: JSON.stringify(dados) }),
       atualizar: (id, dados) =>
-        request(`${API_BASE.candidatos}/candidatos/${id}`, { method: "PUT", body: JSON.stringify(dados) }),
+        request(`${API_BASE.candidatos}/candidatos/${id}`, { method: "PATCH", body: JSON.stringify(dados) }),
       excluir: (id) => request(`${API_BASE.candidatos}/candidatos/${id}`, { method: "DELETE" }),
     },
 

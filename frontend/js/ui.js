@@ -11,6 +11,7 @@
     { href: "index.html", label: "Home" },
     { href: "vagas.html", label: "Vagas" },
     { href: "candidatos.html", label: "Candidatos" },
+    { href: "empresas.html", label: "Empresas" },
     { href: "empresa-cadastro.html", label: "Cadastrar empresa" },
     { href: "vaga-cadastro.html", label: "Cadastrar vaga" },
     { href: "candidato-cadastro.html", label: "Cadastrar candidato" },

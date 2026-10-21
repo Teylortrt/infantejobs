@@ -1,3 +1,5 @@
+
+
 # Guia do frontend
 
 Este documento orienta a equipe a executar o frontend e integrá-lo aos
@@ -76,7 +78,7 @@ As funções de `js/api.js` usam os seguintes endpoints:
 | --- | --- |
 | Empresas | `GET /empresas`, `GET /empresas/:id`, `POST /empresas`, `PUT /empresas/:id`, `DELETE /empresas/:id` |
 | Vagas | `GET /vagas`, `GET /vagas/:id`, `POST /vagas`, `PUT /vagas/:id`, `DELETE /vagas/:id` |
-| Candidatos | `GET /candidatos`, `GET /candidatos/:id`, `POST /candidatos`, `PUT /candidatos/:id`, `DELETE /candidatos/:id` |
+| Candidatos | `GET /candidatos`, `GET /candidatos/:id`, `POST /candidatos`, `PATCH /candidatos/:id`, `DELETE /candidatos/:id` |
 | Candidaturas | `GET /candidaturas`, `GET /candidaturas/:id`, `POST /candidaturas`, `PUT /candidaturas/:id`, `DELETE /candidaturas/:id` |
 
 As operações de listagem devem retornar arrays JSON; operações de criação e
@@ -84,14 +86,20 @@ consulta devem retornar o registro em JSON. Erros devem retornar um status HTTP
 de falha e, preferencialmente, uma mensagem em `message` ou `error` para que a
 interface possa exibi-la.
 
+As listagens aceitam busca exata por documento: `GET /candidatos?cpf=...` e
+`GET /empresas?cpf=...` ou `GET /empresas?cnpj=...`. Os documentos podem ser
+enviados formatados ou apenas com dígitos. As páginas **Candidatos** e
+**Empresas** permitem localizar, editar e excluir os registros.
+
 Os formulários enviam estes campos:
 
-- **Empresa:** `nome`, `cnpj` (somente dígitos), `email`, `telefone`, `cidade`.
+- **Empresa:** `nome`, `cnpj` (somente dígitos), `cpf` do responsável
+  (opcional, somente dígitos), `email`, `telefone`, `cidade`.
 - **Vaga:** `titulo`, `descricao`, `salario` (número ou omitido),
   `modalidade` (`Presencial`, `Hibrido` ou `Remoto`), `cidade`, `requisitos`
   (array de strings), `empresaId` e `status` (`ABERTA` ou `FECHADA`).
-- **Candidato:** `nome`, `email`, `telefone`, `cidade`, `habilidades` (array
-  de strings) e `curriculoUrl` (opcional).
+- **Candidato:** `nome`, `cpf` (somente dígitos), `email`, `telefone`,
+  `cidade`, `habilidades` (array de strings) e `curriculoUrl` (opcional).
 - **Candidatura:** `vagaId`, `candidatoId`, `data` (data ISO) e `status`
   (`ENVIADA`).
 

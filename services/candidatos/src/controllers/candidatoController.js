@@ -1,16 +1,33 @@
 const mongoose = require('mongoose');
 const Candidato = require('../models/Candidato');
 
+function criarRegexDocumento(digitos, grupos) {
+    const partes = [];
+    let inicio = 0;
+    for (const tamanho of grupos) {
+        partes.push(digitos.slice(inicio, inicio + tamanho));
+        inicio += tamanho;
+    }
+    return new RegExp(`^${partes.join('[.\\-/\\s]?')}$`);
+}
+
 //=========================
 //LISTAR CANDIDATOS//
 //=========================
 // GET /candidatos
 const listarCandidatos = async (req, res) => {
     try {
-        const { nome, cidade, } = req.query;
+        const { nome, cidade, cpf } = req.query;
         const filtro = {};
         if (nome) filtro.nome = nome;
         if (cidade) filtro.cidade = cidade;
+        if (cpf) {
+            const cpfLimpo = String(cpf).replace(/\D/g, '');
+            if (cpfLimpo.length !== 11) {
+                return res.status(400).json({ erro: 'CPF inválido' });
+            }
+            filtro.cpf = criarRegexDocumento(cpfLimpo, [3, 3, 3, 2]);
+        }
 
         const candidatos = await Candidato.find(filtro).sort({ createdAt: -1 });
         return res.status(200).json(candidatos);
@@ -46,10 +63,17 @@ const buscarCandidatoPorId = async (req, res) => {
 // POST /candidatos
 const criarCandidato = async (req, res) => {
     try {
-    const novoCandidato = await Candidato.create(req.body);
-    return res.status(201).json(novoCandidato);
-    }
-    catch (erro) {
+        const dados = { ...req.body };
+        if (dados.cpf) dados.cpf = String(dados.cpf).replace(/\D/g, '');
+        const novoCandidato = await Candidato.create(dados);
+        return res.status(201).json(novoCandidato);
+    } catch (erro) {
+        if (erro.code === 11000) {
+            return res.status(400).json({ erro: 'CPF ou email já cadastrado' });
+        }
+        if (erro.name === 'ValidationError') {
+            return res.status(400).json({ erro: erro.message });
+        }
         console.error(erro);
         return res.status(500).json({ erro: 'Erro ao criar candidato' });
     }
@@ -64,7 +88,9 @@ const atualizarCandidato = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ erro: 'ID inválido' });
         }
-        const candidato = await Candidato.findByIdAndUpdate(id, req.body,{
+        const dados = { ...req.body };
+        if (dados.cpf) dados.cpf = String(dados.cpf).replace(/\D/g, '');
+        const candidato = await Candidato.findByIdAndUpdate(id, dados,{
             returnDocument: 'after',
             runValidators: true,
             upsert: false
@@ -76,6 +102,9 @@ const atualizarCandidato = async (req, res) => {
     }   catch (erro) {
         if (erro.code === 11000) {
             return res.status(400).json({ erro: 'CPF ou email já cadastrado' });
+        }
+        if (erro.name === 'ValidationError') {
+            return res.status(400).json({ erro: erro.message });
         }
         console.error(erro);
         return res.status(500).json({ erro: 'Erro ao atualizar candidato' });
