@@ -1,16 +1,40 @@
 const mongoose = require('mongoose');
 const Empresa = require('../models/Empresas');
 
+function criarRegexDocumento(digitos, grupos) {
+    const partes = [];
+    let inicio = 0;
+    for (const tamanho of grupos) {
+        partes.push(digitos.slice(inicio, inicio + tamanho));
+        inicio += tamanho;
+    }
+    return new RegExp(`^${partes.join('[.\\-/\\s]?')}$`);
+}
+
 //=========================
 //LISTAR EMPRESAS//
 //=========================
 // GET /empresas
 const listarEmpresas = async (req, res) => {
     try {
-        const { nome, cidade, } = req.query;
+        const { nome, cidade, cpf, cnpj } = req.query;
         const filtro = {};
         if (nome) filtro.nome = nome;
         if (cidade) filtro.cidade = cidade;
+        if (cpf) {
+            const cpfLimpo = String(cpf).replace(/\D/g, '');
+            if (cpfLimpo.length !== 11) {
+                return res.status(400).json({ erro: 'CPF inválido' });
+            }
+            filtro.cpf = criarRegexDocumento(cpfLimpo, [3, 3, 3, 2]);
+        }
+        if (cnpj) {
+            const cnpjLimpo = String(cnpj).replace(/\D/g, '');
+            if (cnpjLimpo.length !== 14) {
+                return res.status(400).json({ erro: 'CNPJ inválido' });
+            }
+            filtro.cnpj = criarRegexDocumento(cnpjLimpo, [2, 3, 3, 4, 2]);
+        }
 
         const empresas = await Empresa.find(filtro).sort({ createdAt: -1 });
         return res.status(200).json(empresas);
@@ -46,22 +70,35 @@ const buscarEmpresaPorId = async (req, res) => {
 // POST /empresas
 const criarEmpresa = async (req, res) => {
     try {
-        const { nome, cnpj, cidade, telefone, email } = req.body;
-    if (!nome || !cnpj || !cidade) {
-        return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
-    }
+        const { nome, cnpj, cpf, cidade, telefone, email } = req.body;
+        const cnpjLimpo = String(cnpj || '').replace(/\D/g, '');
+        const cpfLimpo = String(cpf || '').replace(/\D/g, '');
+        if (!nome || !cnpjLimpo || !cidade) {
+            return res.status(400).json({ erro: 'Nome, CNPJ e cidade são obrigatórios' });
+        }
+        if (cnpjLimpo.length !== 14) {
+            return res.status(400).json({ erro: 'CNPJ inválido' });
+        }
+        if (cpfLimpo && cpfLimpo.length !== 11) {
+            return res.status(400).json({ erro: 'CPF do responsável inválido' });
+        }
 
-    const novaEmpresa = await Empresa.create({ 
-        nome, 
-        cnpj, 
-        cidade,
-        telefone,
-        email
-    });
-    return res.status(201).json(novaEmpresa);
-
-    }
-    catch (erro) {
+        const novaEmpresa = await Empresa.create({
+            nome,
+            cnpj: cnpjLimpo,
+            cpf: cpfLimpo || undefined,
+            cidade,
+            telefone,
+            email
+        });
+        return res.status(201).json(novaEmpresa);
+    } catch (erro) {
+        if (erro.code === 11000) {
+            return res.status(400).json({ erro: 'CNPJ já cadastrado' });
+        }
+        if (erro.name === 'ValidationError') {
+            return res.status(400).json({ erro: erro.message });
+        }
         console.error(erro);
         return res.status(500).json({ erro: 'Erro ao criar empresa' });
     }
@@ -76,7 +113,15 @@ const atualizarEmpresa = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ erro: 'ID inválido' });
         }
-        const empresa = await Empresa.findByIdAndUpdate(id, req.body,{
+        const dados = { ...req.body };
+        if (dados.cnpj) dados.cnpj = String(dados.cnpj).replace(/\D/g, '');
+        if (dados.cpf) {
+            dados.cpf = String(dados.cpf).replace(/\D/g, '');
+            if (dados.cpf.length !== 11) {
+                return res.status(400).json({ erro: 'CPF do responsável inválido' });
+            }
+        }
+        const empresa = await Empresa.findByIdAndUpdate(id, dados,{
             returnDocument: 'after',
             runValidators: true,
             upsert: false
@@ -88,6 +133,9 @@ const atualizarEmpresa = async (req, res) => {
     }   catch (erro) {
         if (erro.code === 11000) {
             return res.status(400).json({ erro: 'CNPJ ou email já cadastrado' });
+        }
+        if (erro.name === 'ValidationError') {
+            return res.status(400).json({ erro: erro.message });
         }
         console.error(erro);
         return res.status(500).json({ erro: 'Erro ao atualizar empresa' });

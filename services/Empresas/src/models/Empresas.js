@@ -16,6 +16,11 @@ const empresaSchema = new mongoose.Schema(
             trim: true
         },
 
+        cpf: {
+            type: String,
+            trim: true
+        },
+
         cidade: {
             type: String,
             required: [true, 'A cidade é obrigatória'],

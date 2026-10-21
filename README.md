@@ -65,7 +65,7 @@ flowchart LR
 
 | Microsserviço | Porta | Banco | Responsabilidade |
 | :--- | :---: | :--- | :--- |
-| **`Empresas`** | `3001` | `db_empresas` | CRUD de empresas (nome, CNPJ, contato). |
+docker run --name infantejobs-mongo -p 27017:27017 -d mongo:7| **`Empresas`** | `3001` | `db_empresas` | CRUD de empresas (nome, CNPJ, CPF do responsável e contato). |
 | **`vagas`** | `3002` | `db_vagas` | CRUD de vagas e ciclo de vida (`ABERTA` → `FECHADA`). Valida a empresa consultando `:3001`. |
 | **`candidatos`** | `3003` | `db_candidatos` | CRUD de perfis de candidatos (dados pessoais e habilidades). |
 | **`candidaturas`** | `3004` | `db_candidaturas` | Registro e acompanhamento de inscrições. Valida vaga (`:3002`) e candidato (`:3003`). |
@@ -165,7 +165,7 @@ Veja também o [guia do frontend](frontend/README.md).
 
 | Serviço | Método | Rota | Descrição |
 | :--- | :---: | :--- | :--- |
-| Empresas | `GET` | `/empresas` | Lista empresas |
+| Empresas | `GET` | `/empresas` | Lista empresas (`?cpf=` ou `?cnpj=` para buscar por documento) |
 | | `GET` | `/empresas/:id` | Busca por ID |
 | | `POST` | `/empresas` | Cria empresa |
 | | `PUT` | `/empresas/:id` | Atualiza empresa |
@@ -176,7 +176,7 @@ Veja também o [guia do frontend](frontend/README.md).
 | | `PUT` | `/vagas/:id` | Atualiza vaga |
 | | `PATCH` | `/vagas/:id/fechar` | Fecha a vaga (`ABERTA` → `FECHADA`) |
 | | `DELETE` | `/vagas/:id` | Remove vaga |
-| Candidatos | `GET` | `/candidatos` | Lista candidatos |
+| Candidatos | `GET` | `/candidatos` | Lista candidatos (`?cpf=` para buscar por documento) |
 | | `GET` | `/candidatos/:id` | Busca por ID |
 | | `POST` | `/candidatos` | Cria candidato |
 | | `PATCH` | `/candidatos/:id` | Atualiza candidato |
@@ -339,4 +339,3 @@ Projeto desenvolvido como Projeto Integrador.
     </td>
   </tr>
 </table>
-

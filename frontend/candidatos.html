@@ -16,6 +16,20 @@
 
     <div id="alert-candidatos" class="alert"></div>
 
+    <form id="form-busca-candidatos" class="filtros">
+      <div class="row">
+        <div class="six columns">
+          <label for="busca-cpf">Buscar candidato pelo CPF</label>
+          <input type="text" id="busca-cpf" name="cpf" placeholder="000.000.000-00" />
+        </div>
+        <div class="six columns">
+          <label>&nbsp;</label>
+          <button type="submit" class="button-primary">Buscar</button>
+          <button type="reset" id="limpar-busca-candidatos" class="button">Limpar busca</button>
+        </div>
+      </div>
+    </form>
+
     <div id="lista-candidatos">
       <p class="estado-info">Carregando candidatos...</p>
     </div>

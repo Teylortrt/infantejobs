@@ -22,6 +22,7 @@ describe("Cadastro de empresa", () => {
 
     cy.get("#nome").type("Tech Corp");
     cy.get("#cnpj").type("12.345.678/0001-99");
+    cy.get("#cpf").type("123.456.789-00");
     cy.get("#email").type("contato@techcorp.com");
     cy.get("#telefone").type("(51) 3333-4444");
     cy.get("#cidade").type("Porto Alegre");
@@ -31,6 +32,7 @@ describe("Cadastro de empresa", () => {
     cy.wait("@criarEmpresa").its("request.body").should("deep.include", {
       nome: "Tech Corp",
       cnpj: "12345678000199",
+      cpf: "12345678900",
       email: "contato@techcorp.com",
       cidade: "Porto Alegre",
     });
